@@ -1,0 +1,112 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-ajax/iron-ajax.html">
+<link rel="import" href="../shibui-dropdown-menu/shibui-dropdown-menu.html">
+<link rel="import" href="../paper-button/paper-button.html">
+
+<dom-module id="product-translate">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <iron-ajax id="languageRequest" auto method="get" handle-as="json" on-response="languageObtained" on-error="languageError"
+      url="[[languageRoute]]" debounce-duration="300">
+    </iron-ajax>
+    <shibui-dropdown-menu>
+      <paper-button slot="trigger">Lenguaje</paper-button>
+      <paper-button data-lang="en" on-tap="selectLanguage">English</paper-button>
+      <paper-button data-lang="es" on-tap="selectLanguage">Español</paper-button>
+    </shibui-dropdown-menu>
+  </template>
+
+  <script>
+    /**
+     * `product-translate`
+     * 
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class ProductTranslate extends Polymer.Element {
+      static get is() {
+        return 'product-translate';
+      }
+      static get properties() {
+        return {
+          serverRoute: {
+            type: String,
+            value: "http://localhost:3000"
+          },
+          languaje: {
+            type: Object,
+            value() {
+              return {
+
+              }
+            }
+          },
+          languageSelected: {
+            type: String,
+            value: "",
+
+          },
+          languageRoute: {
+            type: String,
+            value: "http://localhost:3000/es"
+          },
+          defaultLanguage: {
+            type: Object,
+            value() {
+              return {
+                createProduct: {
+                  nameLabel: "nombre",
+                  descriptionLabel: "descripcion",
+                  urlImageLabel: "Url imagen",
+                  priceLabel: "Precio"
+                },
+                searchLabel: {
+                  labelSearch: "Buscar Producto"
+                },
+                buttons: {
+                  cartButton: "Carrito",
+                  cardButton: "Ver Mas",
+                  addCart: "Agregar al carrito"
+                }
+              }
+            }
+          }
+        };
+      }
+
+      selectLanguage(event) {
+        this.set("languageSelected", event.target.getAttribute("data-lang"));
+        let route = this.serverRoute;
+        this.set("languageRoute", `${route}/${this.languageSelected}`);
+        this.$.languageRequest.generateRequest();
+      }
+
+      languageObtained(event) {
+        this.set("languageRoute", this.serverRoute);
+        this.dispatchEvent(new CustomEvent("language-obtained", {
+          bubbles: false,
+          composed: false,
+          detail: event.detail.response
+        }));
+
+      }
+
+      languageError(event) {
+        this.dispatchEvent(new CustomEvent("language-error", {
+          bubbles: false,
+          composed: false,
+          detail: this.defaultLanguage
+        }));
+      }
+
+    }
+
+    window.customElements.define(ProductTranslate.is, ProductTranslate);
+  </script>
+</dom-module>
