@@ -2,6 +2,7 @@
 <link rel="import" href="../iron-ajax/iron-ajax.html">
 <link rel="import" href="../shibui-dropdown-menu/shibui-dropdown-menu.html">
 <link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
 
 <dom-module id="product-translate">
   <template>
@@ -13,11 +14,13 @@
     <iron-ajax id="languageRequest" method="get" handle-as="json" on-response="languageObtained" on-error="languageError"
       url="[[languageRoute]]" debounce-duration="300">
     </iron-ajax>
-    <shibui-dropdown-menu>
-      <paper-button slot="trigger">Lenguaje</paper-button>
-      <paper-button data-lang="en" on-tap="selectLanguage">English</paper-button>
-      <paper-button data-lang="es" on-tap="selectLanguage">Español</paper-button>
-    </shibui-dropdown-menu>
+    <template is="dom-if" if="[[!invisibleDropDown]]">
+      <shibui-dropdown-menu>
+        <paper-button slot="trigger">Lenguaje</paper-button>
+        <paper-button data-lang="en" on-tap="selectLanguage">English</paper-button>
+        <paper-button data-lang="es" on-tap="selectLanguage">Español</paper-button>
+      </shibui-dropdown-menu>
+    </template>
   </template>
 
   <script>
@@ -49,7 +52,7 @@
           },
           languageSelected: {
             type: String,
-            value: ""
+            value: "es"
           },
           defaultLanguage: {
             type: Object,
@@ -68,15 +71,29 @@
                   cartButton: "Carrito",
                   cardButton: "Ver Mas",
                   addCart: "Agregar al carrito"
+                },
+                navLinks: {
+                  createProduct: "Crear producto",
+                  productList: "Ver productos"
                 }
               }
             }
+          },
+          invisibleDropDown: {
+            type: Boolean,
+            value: false
           }
         };
       }
 
+      ready() {
+        super.ready();
+        this.set("languageRoute", `${this.serverRoute}/es`);
+        this.$.languageRequest.generateRequest();
+      }
+
       selectLanguage(event) {
-        let abbreviation=event.target.getAttribute("data-lang")
+        let abbreviation = event.target.getAttribute("data-lang")
         this.set("languageRoute", `${this.serverRoute}/${abbreviation}`);
         this.$.languageRequest.generateRequest();
       }
@@ -88,7 +105,7 @@
           composed: false,
           detail: event.detail.response
         }));
-
+        this.set("invisibleDropDown", false);
       }
 
       languageError(event) {
@@ -97,6 +114,7 @@
           composed: false,
           detail: this.defaultLanguage
         }));
+        this.set("invisibleDropDown", true);
       }
 
     }
