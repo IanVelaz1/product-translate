@@ -1,6 +1,25 @@
 # \<product-translate\>
 
 
+## Install bower
+```
+$ npm i bower
+```
+
+## run bower install
+```
+$ npm i bower
+```
+
+## variables in product-translate
+```
+ serverRoute:String //used to indicate the server route
+ language:Object //contains all the properties asigned for the recovered language
+ languageSelected:String // used to indicate the language that will be recovered "es"-"en"
+ defaultLanguage:Object //backup used in case no language is recovered
+ languageRoute:String //route used in the iron-ajax request its a combination of serverRoute and languageSelected
+ invisibleDropDown:Boolean //used to determine if the dropdown will be visible or not default:false
+```
 
 ## Install the Polymer-CLI
 
